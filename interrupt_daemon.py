@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 import time, os, sys, socket, math, atexit
 import RPi.GPIO as GPIO
-try:
-    import thread
-except ImportError:
-    import _thread as thread
+import _thread as thread
+
+RAINFALL_PIN = 6
+RAINFALL_BUCKET_VOL = 0.2794
+ANEMOMETER_PIN = 5
+WINDSPEED_CALIBRATION = 1.18
 
 class interrupt_watcher(object):
     def __init__(self, sensorPin, bounceTime, peak_sample = 5, peak_monitor = False):
@@ -46,7 +48,7 @@ class interrupt_watcher(object):
         self.running = False
         
 class wind_speed_interrupt_watcher(interrupt_watcher):
-    def __init__(self, radius_cm, sensorPin, bounceTime, calibration = 2.36):
+    def __init__(self, radius_cm, sensorPin, bounceTime, calibration = WINDSPEED_CALIBRATION):
         super(wind_speed_interrupt_watcher, self).__init__(sensorPin, bounceTime, peak_sample = 5, peak_monitor = True)
         
         circumference_cm = (2 * math.pi) * radius_cm
@@ -84,8 +86,8 @@ class interrupt_daemon(object):
         self.socket_data = "{0}\n"
         
     def setup(self):
-        self.rain = rainfall_interrupt_watcher(0.2794, 6, 300) #Maplin rain gauge = 0.2794 ml per bucket tip, was 27 on prototype
-        self.wind = wind_speed_interrupt_watcher(9.0, 5, 1) #Maplin anemometer = radius of 9 cm, was 17 on prototype
+        self.rain = rainfall_interrupt_watcher(RAINFALL_BUCKET_VOL, RAINFALL_PIN, 300) #Maplin rain gauge = 0.2794 ml per bucket tip, was 27 on prototype
+        self.wind = wind_speed_interrupt_watcher(9.0, ANEMOMETER_PIN, 1) #Maplin anemometer = radius of 9 cm, was 17 on prototype
         
         try:
             self.skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -20,13 +20,22 @@ class interrupt_client(object):
         except ValueError:
             return None
 
-    def get_rain(self):
+    def get_rain(self, round_it=False):
+        if round_it:
+            rainfall = self.send_command("RAIN")
+            return round(rainfall, 4)
         return self.send_command("RAIN")
 
-    def get_wind(self):
+    def get_wind(self, round_it=False):
+        if round_it:
+            windspeed = self.send_command("WIND")
+            return round(windspeed, 2)
         return self.send_command("WIND")
         
-    def get_wind_gust(self):
+    def get_wind_gust(self, round_it=False):
+        if round_it:
+            wind_gusts = self.send_command("GUST")
+            return round(wind_gusts, 2)
         return self.send_command("GUST")
         
     def reset(self):

@@ -1,0 +1,6 @@
+__pycache__/bme280_sensor.cpython-39.pyc
+__pycache__/database.cpython-39.pyc
+__pycache__/ds18b20_therm.cpython-39.pyc
+__pycache__/interrupt_client.cpython-39.pyc
+__pycache__/wind_direction_byo.cpython-39.pyc
+weather.db

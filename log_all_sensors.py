@@ -1,20 +1,22 @@
 #!/usr/bin/python3
-import interrupt_client, MCP342X, wind_direction, HTU21D, bmp085, tgs2600, ds18b20_therm
+import interrupt_client
+import ds18b20_therm
+import bme280_sensor
+import wind_direction_byo
 import database 
 
-pressure = bmp085.BMP085()
-temp_probe = ds18b20_therm.DS18B20()
-air_qual = tgs2600.TGS2600(adc_channel = 0)
-humidity = HTU21D.HTU21D()
-wind_dir = wind_direction.wind_direction(adc_channel = 0, config_file="wind_direction.json")
+# Set-up weather objects
+wind_dir = wind_direction_byo
 interrupts = interrupt_client.interrupt_client(port = 49501)
+db = database.weather_database() # Local sqlite3 databse
 
-db = database.weather_database() #Local MySQL db
+wind_average = round(wind_dir.get_value(10), 2) # ten seconds
 
-wind_average = wind_dir.get_value(10) #ten seconds
+temp_probe = ds18b20_therm.DS18B20()
+humidity, pressure, ambient_temp = bme280_sensor.read_all()
 
 print("Inserting...")
-db.insert(humidity.read_temperature(), temp_probe.read_temp(), air_qual.get_value(), pressure.get_pressure(), humidity.read_humidity(), wind_average, interrupts.get_wind(), interrupts.get_wind_gust(), interrupts.get_rain())
+db.insert(ambient_temp, temp_probe.read_temp(), 0.0, pressure, humidity, wind_average, interrupts.get_wind(round_it=True), interrupts.get_wind_gust(round_it=True), interrupts.get_rain(round_it=True))
 print("done")
 
 interrupts.reset()
