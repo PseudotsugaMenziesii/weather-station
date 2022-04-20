@@ -3,7 +3,8 @@ import time
 import math
 
 
-ADC = MCP3008(channel=0)
+# ADC = MCP3008(channel=0)
+# ADC.close()
 
 voltage_bearing = {0.4: 0, 
                    1.4: 22.5, 
@@ -57,6 +58,9 @@ def get_value(time_secs=5):
     data = []
     start_time = time.time()
 
+    # Open device connection
+    ADC = MCP3008(channel=0)
+
     while time.time() - start_time < time_secs:
         wind = round(ADC.value * 3.3, 1)
         wind_angle = get_angle(wind)
@@ -64,8 +68,14 @@ def get_value(time_secs=5):
             data.append(wind_angle)
         # else:
         #     print(f"'{wind}' not a known directional voltage")
-    
-    return get_average(data)
+
+    # Close device connection
+    ADC.close()
+
+    if data:
+        return get_average(data)
+    print("NO GOOD WIND DIRECTION VALUES!!")
+    return 999.99
 
 if __name__ == '__main__':
     print(get_value(10))
