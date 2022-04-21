@@ -1,0 +1,15 @@
+[Unit]
+Description=Weather Data Exporter
+Wants=network-online.target
+After=network-online.target
+Requires=weather.service
+After=weather.service
+
+[Service]
+User=pi
+Group=pi
+Type=simple
+ExecStart=/home/pi/weather-station/./weather_poller.py
+
+[Install]
+WantedBy=multi-user.target

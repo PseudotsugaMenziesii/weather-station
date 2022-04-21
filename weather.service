@@ -1,0 +1,17 @@
+[Unit]
+Description=Weather Interrupt Daemon
+Wants=network-online.target
+After=network-online.target
+Wants=weather-poller.service
+Before=weather-poller.service
+
+[Service]
+User=pi
+Group=pi
+Type=simple
+ExecStart=/home/pi/weather-station/./interrupt_daemon.py start
+ExecReload=/home/pi/weather-station/./interrupt_daemon.py restart
+ExecStop=/home/pi/weather-station/./interrupt_daemon.py stop
+
+[Install]
+WantedBy=multi-user.target

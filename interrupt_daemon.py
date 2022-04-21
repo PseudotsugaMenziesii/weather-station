@@ -168,10 +168,7 @@ class interrupt_daemon(object):
         
     def start(self):
         try:
-            self.daemon_pid = None
-            self.daemonize()
-            self.daemon_pid = os.getpid()
-            print("PID: %d" % self.daemon_pid)
+            print("Starting weather service...")
             self.setup()
             while self.running:
                 conn, addr =  self.skt.accept() #blocking call
@@ -181,11 +178,10 @@ class interrupt_daemon(object):
             if self.running:
                 self.stop()
         finally:
-            if self.daemon_pid == os.getpid():
-                self.skt.shutdown(socket.SHUT_RDWR)
-                self.skt.close()
-                GPIO.cleanup()
-                print("Stopped")
+            self.skt.shutdown(socket.SHUT_RDWR)
+            self.skt.close()
+            GPIO.cleanup()
+            print("Stopped")
         
     def stop(self):
         self.running = False        
